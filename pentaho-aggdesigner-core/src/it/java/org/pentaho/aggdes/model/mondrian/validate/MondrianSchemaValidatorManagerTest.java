@@ -13,29 +13,32 @@
 * See the GNU General Public License for more details.
 *
 *
-* Copyright 2006 - 2020 Hitachi Vantara.  All rights reserved.
+* Copyright 2006 - 2024 Hitachi Vantara.  All rights reserved.
 */
 
 package org.pentaho.aggdes.model.mondrian.validate;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jmock.Expectations;
-import org.jmock.integration.junit4.JMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.pentaho.aggdes.model.mondrian.validate.MondrianSchemaValidator;
 
-@RunWith(JMock.class)
+@RunWith(MockitoJUnitRunner.class)
 public class MondrianSchemaValidatorManagerTest extends AbstractMondrianSchemaValidatorTestBase {
 
-  private static final Log logger = LogFactory.getLog(DimensionFkValidatorTest.class);
+  private static final Log logger = LogFactory.getLog(MondrianSchemaValidatorManagerTest.class);
 
   private MondrianSchemaValidatorManager bean = new MondrianSchemaValidatorManager();
 
@@ -46,25 +49,19 @@ public class MondrianSchemaValidatorManagerTest extends AbstractMondrianSchemaVa
 
   @Test
   public void testValidateSchema() {
-    List<MondrianSchemaValidator> list = new ArrayList<MondrianSchemaValidator>();
+    List<MondrianSchemaValidator> list = new ArrayList<>();
     list.add(v1);
     list.add(v2);
     list.add(v3);
     list.add(v4);
     list.add(v5);
-    
-    context.checking(new Expectations() {
-      {
-        one(v1).validateCube(with(equal(schema)), with(equal(getCubeByName("Sales"))), with(equal(conn)));
-        one(v2).validateCube(with(equal(schema)), with(equal(getCubeByName("Sales"))), with(equal(conn)));
-        one(v3).validateCube(with(equal(schema)), with(equal(getCubeByName("Sales"))), with(equal(conn)));
-        one(v4).validateCube(with(equal(schema)), with(equal(getCubeByName("Sales"))), with(equal(conn)));
-        one(v5).validateCube(with(equal(schema)), with(equal(getCubeByName("Sales"))), with(equal(conn)));
-      }
-    });
-    
+
     bean.setValidators(list);
     bean.validateCube(schema, getCubeByName("Sales"), conn);
 
+    // Verify that validateCube method of each validator is called
+    for (MondrianSchemaValidator validator : list) {
+      verify(validator).validateCube(eq(schema), eq(getCubeByName("Sales")), eq(conn));
+    }
   }
 }

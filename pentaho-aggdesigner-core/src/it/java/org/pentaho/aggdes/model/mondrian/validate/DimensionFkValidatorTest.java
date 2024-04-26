@@ -13,27 +13,26 @@
 * See the GNU General Public License for more details.
 *
 *
-* Copyright 2006 - 2020 Hitachi Vantara.  All rights reserved.
+* Copyright 2006 - 2024 Hitachi Vantara.  All rights reserved.
 */
 
 package org.pentaho.aggdes.model.mondrian.validate;
 
 import static org.junit.Assert.assertTrue;
-import static org.pentaho.aggdes.model.ValidationMessage.Type.ERROR;
-import static org.pentaho.aggdes.model.ValidationMessage.Type.OK;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jmock.Expectations;
-import org.jmock.integration.junit4.JMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.pentaho.aggdes.model.ValidationMessage;
 
-@RunWith(JMock.class)
+@RunWith(MockitoJUnitRunner.class)
 public class DimensionFkValidatorTest extends AbstractMondrianSchemaValidatorTestBase {
 
   private static final Log logger = LogFactory.getLog(DimensionFkValidatorTest.class);
@@ -47,125 +46,62 @@ public class DimensionFkValidatorTest extends AbstractMondrianSchemaValidatorTes
 
   @Test
   public void testNullableFalseCheckUsingMetaData() throws Exception {
-    // expectations
-    context.checking(new Expectations() {
-      {
-        // conn expectations
-        one(conn).getMetaData();
-        will(returnValue(meta));
-
-
-        // meta expectations
-        allowing(meta).getColumns(with(aNull(String.class)), with(aNull(String.class)), with(equal("sales_fact_1997")),
-            with(any(String.class)));
-        will(returnValue(rsSalesFact1997ForeignKey));
-
-        allowing(rsSalesFact1997ForeignKey).next();
-        will(returnValue(true));
-        allowing(rsSalesFact1997ForeignKey).getString("IS_NULLABLE");
-        will(returnValue("NO"));
-      }
-    });
+    // Mocking expectations
+    when(conn.getMetaData()).thenReturn(meta);
+    when(meta.getColumns(null, null, "sales_fact_1997", null)).thenReturn(rsSalesFact1997ForeignKey);
+    when(rsSalesFact1997ForeignKey.next()).thenReturn(true);
+    when(rsSalesFact1997ForeignKey.getString("IS_NULLABLE")).thenReturn("NO");
 
     List<ValidationMessage> messages = bean.validateCube(schema, getCubeByName("Sales"), conn);
 
+    // Assertions
     if (logger.isDebugEnabled()) {
       logger.debug("got " + messages.size() + " message(s): " + messages);
     }
-    
-    // asserts
     assertTrue(isMessagePresent(messages, OK, "Sales", "sales_fact_1997", "store_id"));
-
   }
-  
+
   @Test
   public void testNullableTrueCheckUsingMetaData() throws Exception {
-    // expectations
-    context.checking(new Expectations() {
-      {
-        // conn expectations
-        one(conn).getMetaData();
-        will(returnValue(meta));
-        allowing(conn).createStatement();
-        will(returnValue(stmt));
-
-        // stmt expectations
-        allowing(stmt).executeQuery(with(any(String.class)));
-        will(returnValue(rsCount));
-        allowing(stmt).close();
-        
-        // rsCount
-        allowing(rsCount).next();
-        will(returnValue(true));
-        allowing(rsCount).getLong("null_count");
-        will(returnValue(0L));
-
-        // meta expectations
-        allowing(meta).getColumns(with(aNull(String.class)), with(aNull(String.class)), with(equal("sales_fact_1997")),
-            with(any(String.class)));
-        will(returnValue(rsSalesFact1997ForeignKey));
-
-        allowing(rsSalesFact1997ForeignKey).next();
-        will(returnValue(true));
-        allowing(rsSalesFact1997ForeignKey).getString("IS_NULLABLE");
-        will(returnValue("YES"));
-      }
-    });
+    // Mocking expectations
+    when(conn.getMetaData()).thenReturn(meta);
+    when(conn.createStatement()).thenReturn(stmt);
+    when(stmt.executeQuery("SELECT COUNT(*) AS null_count FROM sales_fact_1997 WHERE store_id IS NULL"))
+      .thenReturn(rsCount);
+    when(rsCount.next()).thenReturn(true);
+    when(rsCount.getLong("null_count")).thenReturn(0L);
+    when(meta.getColumns(null, null, "sales_fact_1997", null)).thenReturn(rsSalesFact1997ForeignKey);
+    when(rsSalesFact1997ForeignKey.next()).thenReturn(true);
+    when(rsSalesFact1997ForeignKey.getString("IS_NULLABLE")).thenReturn("YES");
 
     List<ValidationMessage> messages = bean.validateCube(schema, getCubeByName("Sales"), conn);
 
+    // Assertions
     if (logger.isDebugEnabled()) {
       logger.debug("got " + messages.size() + " message(s): " + messages);
     }
-    
-    // asserts
     assertTrue(isMessagePresent(messages, OK, "Sales", "sales_fact_1997", "store_id"));
-
   }
-  
+
   @Test
   public void testNullableTrueCheckUsingResultSet() throws Exception {
-    // expectations
-    context.checking(new Expectations() {
-      {
-        // conn expectations
-        one(conn).getMetaData();
-        will(returnValue(meta));
-        allowing(conn).createStatement();
-        will(returnValue(stmt));
-
-        // stmt expectations
-        allowing(stmt).executeQuery(with(any(String.class)));
-        will(returnValue(rsCount));
-        allowing(stmt).close();
-        
-        // rsCount
-        allowing(rsCount).next();
-        will(returnValue(true));
-        allowing(rsCount).getLong("null_count");
-        will(returnValue(14L));
-
-        // meta expectations
-        allowing(meta).getColumns(with(aNull(String.class)), with(aNull(String.class)), with(equal("sales_fact_1997")),
-            with(any(String.class)));
-        will(returnValue(rsSalesFact1997ForeignKey));
-
-        allowing(rsSalesFact1997ForeignKey).next();
-        will(returnValue(true));
-        allowing(rsSalesFact1997ForeignKey).getString("IS_NULLABLE");
-        will(returnValue("YES"));
-      }
-    });
+    // Mocking expectations
+    when(conn.getMetaData()).thenReturn(meta);
+    when(conn.createStatement()).thenReturn(stmt);
+    when(stmt.executeQuery("SELECT COUNT(*) AS null_count FROM sales_fact_1997 WHERE store_id IS NULL"))
+      .thenReturn(rsCount);
+    when(rsCount.next()).thenReturn(true);
+    when(rsCount.getLong("null_count")).thenReturn(14L);
+    when(meta.getColumns(null, null, "sales_fact_1997", null)).thenReturn(rsSalesFact1997ForeignKey);
+    when(rsSalesFact1997ForeignKey.next()).thenReturn(true);
+    when(rsSalesFact1997ForeignKey.getString("IS_NULLABLE")).thenReturn("YES");
 
     List<ValidationMessage> messages = bean.validateCube(schema, getCubeByName("Sales"), conn);
 
+    // Assertions
     if (logger.isDebugEnabled()) {
       logger.debug("got " + messages.size() + " message(s): " + messages);
     }
-    
-    // asserts
     assertTrue(isMessagePresent(messages, ERROR, "Sales", "sales_fact_1997", "store_id"));
-
   }
-
 }

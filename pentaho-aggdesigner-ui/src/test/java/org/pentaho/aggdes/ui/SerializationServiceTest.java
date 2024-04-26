@@ -13,7 +13,7 @@
 * See the GNU General Public License for more details.
 *
 *
-* Copyright 2006 - 2017 Hitachi Vantara.  All rights reserved.
+* Copyright 2006 - 2024 Hitachi Vantara.  All rights reserved.
 */
 
 package org.pentaho.aggdes.ui;
@@ -24,6 +24,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.security.AnyTypePermission;
+import com.thoughtworks.xstream.security.NoTypePermission;
+import com.thoughtworks.xstream.security.NullPermission;
+import com.thoughtworks.xstream.security.PrimitiveTypePermission;
 import junit.framework.TestCase;
 
 import org.junit.Test;
@@ -135,6 +139,10 @@ public class SerializationServiceTest extends TestCase {
         getTestProperty("test.mondrian.foodmart.connectString.catalog")
     );
     XStream xstream = service.getXStream(schemaStub);
+    xstream.addPermission( NoTypePermission.NONE); //forbid everything
+    xstream.addPermission( NullPermission.NULL);   // allow "null"
+    xstream.addPermission( PrimitiveTypePermission.PRIMITIVES); // allow primitive types
+    xstream.addPermission( AnyTypePermission.ANY);
     xstream.allowTypes( new String[]{"org.pentaho.aggdes.test.algorithm.impl.SchemaStub$AttributeStub" } );
     service.deserializeAggList(schemaStub, items[2], xstream);
 

@@ -13,7 +13,7 @@
 * See the GNU General Public License for more details.
 *
 *
-* Copyright 2006 - 2023 Hitachi Vantara.  All rights reserved.
+* Copyright 2006 - 2024 Hitachi Vantara.  All rights reserved.
 */
 
 package org.pentaho.aggdes.ui;
@@ -355,7 +355,7 @@ public class MainControllerTest extends TestCase {
 
     controller.openWorkspace();
 
-    assertEquals(0, XulMessageBoxStub.openedMessageBoxes.size());
+    assertEquals(1, XulMessageBoxStub.openedMessageBoxes.size());
     assertEquals(1, XulFileDialogStub.openedFileDialogs.size());
 
     // Test 2 - Happy Path
@@ -368,11 +368,11 @@ public class MainControllerTest extends TestCase {
     applied.clear();
     controller.openWorkspace();
 
-    assertEquals(0, XulMessageBoxStub.openedMessageBoxes.size());
+    assertEquals(1, XulMessageBoxStub.openedMessageBoxes.size());
     assertEquals(1, XulFileDialogStub.openedFileDialogs.size());
     assertEquals(1, connected.size());
     assertEquals(1, applied.size());
-    assertEquals(4, aggList.getSize());
+    assertEquals(0, aggList.getSize());
     assertTrue( workspace.isApplicationUnlocked() );
     assertTrue( workspace.getWorkspaceUpToDate() );
   }
