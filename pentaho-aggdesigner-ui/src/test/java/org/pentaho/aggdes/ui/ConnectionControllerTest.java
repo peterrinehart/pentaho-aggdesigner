@@ -19,23 +19,13 @@
 package org.pentaho.aggdes.ui;
 
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.Arrays;
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.pentaho.aggdes.AggDesignerException;
+import org.pentaho.aggdes.model.Schema;
 import org.pentaho.aggdes.output.OutputService;
 import org.pentaho.aggdes.ui.ext.SchemaProviderUiExtension;
 import org.pentaho.aggdes.ui.form.controller.ConnectionController;
@@ -49,7 +39,19 @@ import org.pentaho.ui.xul.containers.XulDialog;
 import org.pentaho.ui.xul.dom.Document;
 import org.pentaho.ui.xul.impl.XulEventHandler;
 
-@RunWith(MockitoJUnitRunner.class)
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+@RunWith( MockitoJUnitRunner.class )
 public class ConnectionControllerTest {
 
   private ConnectionController controller;
@@ -80,30 +82,30 @@ public class ConnectionControllerTest {
   @Before
   public void setUp() throws Exception {
     controller = new ConnectionController();
-    controller.setConnectionModel(model);
-    controller.setOutputService(outputService);
+    controller.setConnectionModel( model );
+    controller.setOutputService( outputService );
 
-    cubeNames = Arrays.asList("testCube1", "testCube2");
+    cubeNames = Arrays.asList( "testCube1", "testCube2" );
 
-    when(container.getDocumentRoot()).thenReturn(doc);
+    when( container.getDocumentRoot() ).thenReturn( doc );
 
-    controller.setXulDomContainer(container);
-    controller.setDataHandler(dataHandler);
+    controller.setXulDomContainer( container );
+    controller.setDataHandler( dataHandler );
   }
 
   private void setupSchemaProviderDefaults() throws AggDesignerException {
-    lenient().when(aSchemaProvider.isSelected()).thenReturn(true);
-    lenient().when(aSchemaProvider.getCubeNames()).thenReturn(cubeNames);
-    lenient().when(aSchemaProvider.getSchemaModel()).thenReturn(providerModel);
+    lenient().when( aSchemaProvider.isSelected() ).thenReturn( true );
+    lenient().when( aSchemaProvider.getCubeNames() ).thenReturn( cubeNames );
+    lenient().when( aSchemaProvider.getSchemaModel() ).thenReturn( providerModel );
 
-    controller.setSchemaProviders(Arrays.asList(aSchemaProvider));
+    controller.setSchemaProviders( Collections.singletonList( aSchemaProvider ) );
   }
 
   @Test
   public void testReset() throws Exception {
     setupSchemaProviderDefaults();
-    doNothing().when(model).reset();
-    doNothing().when(aSchemaProvider).reset();
+    doNothing().when( model ).reset();
+    doNothing().when( aSchemaProvider ).reset();
 
     controller.reset();
   }
@@ -116,76 +118,76 @@ public class ConnectionControllerTest {
 
   @Test
   public void testLoadDatabaseDialog() {
-    final XulDialog dialog = mock(XulDialog.class);
-    when(doc.getElementById(ConnectionController.GENERAL_DATASOURCE_WINDOW)).thenReturn(dialog);
+    final XulDialog dialog = mock( XulDialog.class );
+    when( doc.getElementById( ConnectionController.GENERAL_DATASOURCE_WINDOW ) ).thenReturn( dialog );
 
-    when(dataHandler.getData()).thenReturn(new DatabaseMeta());
-    when(model.getDatabaseMeta()).thenReturn(new DatabaseMeta());
+    when( dataHandler.getData() ).thenReturn( new DatabaseMeta() );
+    when( model.getDatabaseMeta() ).thenReturn( new DatabaseMeta() );
 
     controller.loadDatabaseDialog();
 
-    verify(dialog).show();
-    verify(model).setDatabaseMeta(any(DatabaseMeta.class));
+    verify( dialog ).show();
+    verify( model ).setDatabaseMeta( any( DatabaseMeta.class ) );
   }
 
-  /*  MODIFIED
+/*
   @Test
   public void testConnect_Success() throws AggDesignerException {
     setupSchemaProviderDefaults();
     controller.setSelectedSchemaProvider(); //mimics the apply having been pressed
 
     final XulDialog waitDialog = new XulDialogStub();
-    when(doc.getElementById(ConnectionController.ANON_WAIT_DIALOG)).thenReturn(waitDialog);
+    when( doc.getElementById( ConnectionController.ANON_WAIT_DIALOG ) ).thenReturn( waitDialog );
 
-    final XulDialog connDialog = mock(XulDialog.class);
-    when(doc.getElementById(ConnectionController.CONNECTION_DIALOG)).thenReturn(connDialog);
+    final XulDialog connDialog = mock( XulDialog.class );
+    when( doc.getElementById( ConnectionController.CONNECTION_DIALOG ) ).thenReturn( connDialog );
 
-    final Schema schema = mock(Schema.class);
-    when(aSchemaProvider.loadSchema("testCube")).thenReturn(schema);
-    when(model.getCubeName()).thenReturn("testCube");
+    final Schema schema = mock( Schema.class );
+    when( aSchemaProvider.loadSchema( "testCube" ) ).thenReturn( schema );
+    when( model.getCubeName() ).thenReturn( "testCube" );
 
     controller.connect();
 
-    verify(connDialog).hide();
-    verify(model).setSchema(schema);
+    verify( connDialog ).hide();
+    verify( model ).setSchema( schema );
   }
-*/
-  /*
 
-    @Test
+
+  @Test
   public void testConnect_Success() throws AggDesignerException {
     setupSchemaProviderDefaults();
     controller.setSelectedSchemaProvider(); //mimics the apply having been pressed
 
     //now call connect
-    context.checking(new Expectations() {
+    context.checking( new Expectations() {
       {
-        //using dialog stub here instead of a mock so we get thread blocking which is needed to have this test run sucessfully
+        //using dialog stub here instead of a mock so we get thread blocking which is needed to have this test run
+        sucessfully
         final XulDialog waitDialog = new XulDialogStub();
-        allowing(doc).getElementById(ConnectionController.ANON_WAIT_DIALOG);
-        will(returnValue(waitDialog));
+        allowing( doc ).getElementById( ConnectionController.ANON_WAIT_DIALOG );
+        will( returnValue( waitDialog ) );
 
-        final XulDialog connDialog = context.mock(XulDialog.class);
-        allowing(doc).getElementById(ConnectionController.CONNECTION_DIALOG);
-        will(returnValue(connDialog));
-        one(connDialog).hide();
+        final XulDialog connDialog = context.mock( XulDialog.class );
+        allowing( doc ).getElementById( ConnectionController.CONNECTION_DIALOG );
+        will( returnValue( connDialog ) );
+        one( connDialog ).hide();
 
-        final Schema schema = context.mock(Schema.class);
-        one(aSchemaProvider).loadSchema("testCube");
-        will(returnValue(schema));
+        final Schema schema = context.mock( Schema.class );
+        one( aSchemaProvider ).loadSchema( "testCube" );
+        will( returnValue( schema ) );
 
-        one(model).getCubeName();
-        will(returnValue("testCube"));
-        one(model).setSchema(schema);
-        ignoring(model).setSchemaUpToDate(with(any(Boolean.class)));
+        one( model ).getCubeName();
+        will( returnValue( "testCube" ) );
+        one( model ).setSchema( schema );
+        ignoring( model ).setSchemaUpToDate( with( any( Boolean.class ) ) );
 
-        ignoring(outputService);
+        ignoring( outputService );
       }
-    });
+    } );
 
     controller.connect();
     //make sure the all the aggdesigner functionality is enabled after a successful connection
-    assertTrue(workspace.isApplicationUnlocked());
+    assertTrue( workspace.isApplicationUnlocked() );
   }
 
 
@@ -193,44 +195,44 @@ public class ConnectionControllerTest {
 
   @Test
   public void testConnectErrorDialogDismiss_Visible() {
-    final XulDialog dialog = mock(XulDialog.class);
-    when(doc.getElementById(ConnectionController.CONNECT_ERROR_DIALOG)).thenReturn(dialog);
-    when(dialog.isHidden()).thenReturn(false);
+    final XulDialog dialog = mock( XulDialog.class );
+    when( doc.getElementById( ConnectionController.CONNECT_ERROR_DIALOG ) ).thenReturn( dialog );
+    when( dialog.isHidden() ).thenReturn( false );
 
     controller.connectErrorDialogDismiss();
 
-    verify(dialog).hide();
+    verify( dialog ).hide();
   }
 
   @Test
   public void testConnectErrorDialogDismiss_NotVisible() {
-    final XulDialog dialog = mock(XulDialog.class);
-    when(doc.getElementById(ConnectionController.CONNECT_ERROR_DIALOG)).thenReturn(dialog);
-    when(dialog.isHidden()).thenReturn(true);
+    final XulDialog dialog = mock( XulDialog.class );
+    when( doc.getElementById( ConnectionController.CONNECT_ERROR_DIALOG ) ).thenReturn( dialog );
+    when( dialog.isHidden() ).thenReturn( true );
 
     controller.connectErrorDialogDismiss();
 
-    verify(dialog, never()).hide();
+    verify( dialog, never() ).hide();
   }
 
   @Test
   public void testShowConnectionDialog() {
-    final XulDialog dialog = mock(XulDialog.class);
-    when(doc.getElementById(ConnectionController.CONNECTION_DIALOG)).thenReturn(dialog);
+    final XulDialog dialog = mock( XulDialog.class );
+    when( doc.getElementById( ConnectionController.CONNECTION_DIALOG ) ).thenReturn( dialog );
 
     controller.showConnectionDialog();
 
-    verify(dialog).show();
+    verify( dialog ).show();
   }
 
   @Test
   public void testHideConnectionDialog() {
-    final XulDialog dialog = mock(XulDialog.class);
-    when(doc.getElementById(ConnectionController.CONNECTION_DIALOG)).thenReturn(dialog);
+    final XulDialog dialog = mock( XulDialog.class );
+    when( doc.getElementById( ConnectionController.CONNECTION_DIALOG ) ).thenReturn( dialog );
 
     controller.hideConnectionDialog();
 
-    verify(dialog).hide();
+    verify( dialog ).hide();
   }
 
   @Test
@@ -238,11 +240,11 @@ public class ConnectionControllerTest {
     setupSchemaProviderDefaults();
 
     final XulDialog waitDialog = new XulDialogStub();
-    when(doc.getElementById(ConnectionController.ANON_WAIT_DIALOG)).thenReturn(waitDialog);
+    when( doc.getElementById( ConnectionController.ANON_WAIT_DIALOG ) ).thenReturn( waitDialog );
 
     controller.apply();
 
-    verify(model).setCubeNames(cubeNames);
-    verify(model).setSelectedSchemaModel(providerModel);
+    verify( model ).setCubeNames( cubeNames );
+    verify( model ).setSelectedSchemaModel( providerModel );
   }
 }

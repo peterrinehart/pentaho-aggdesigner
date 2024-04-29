@@ -1,20 +1,20 @@
 /*
-* This program is free software; you can redistribute it and/or modify it under the
-* terms of the GNU General Public License, version 2 as published by the Free Software
-* Foundation.
-*
-* You should have received a copy of the GNU General Public License along with this
-* program; if not, you can obtain a copy at http://www.gnu.org/licenses/gpl-2.0.html
-* or from the Free Software Foundation, Inc.,
-* 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*
-* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-* See the GNU General Public License for more details.
-*
-*
-* Copyright 2006 - 2020 Hitachi Vantara.  All rights reserved.
-*/
+ * This program is free software; you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License, version 2 as published by the Free Software
+ * Foundation.
+ *
+ * You should have received a copy of the GNU General Public License along with this
+ * program; if not, you can obtain a copy at http://www.gnu.org/licenses/gpl-2.0.html
+ * or from the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ *
+ * Copyright 2006 - 2020 Hitachi Vantara.  All rights reserved.
+ */
 
 package org.pentaho.aggdes.model.mondrian.validate;
 
@@ -42,54 +42,39 @@ import mondrian.olap.MondrianDef.Cube;
 import mondrian.olap.MondrianDef.Schema;
 
 /*
- * This program is free software; you can redistribute it and/or modify it under the 
- * terms of the GNU General Public License, version 2 as published by the Free Software 
+ * This program is free software; you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License, version 2 as published by the Free Software
  * Foundation.
  *
- * You should have received a copy of the GNU General Public License along with this 
- * program; if not, you can obtain a copy at http://www.gnu.org/licenses/gpl-2.0.html 
- * or from the Free Software Foundation, Inc., 
+ * You should have received a copy of the GNU General Public License along with this
+ * program; if not, you can obtain a copy at http://www.gnu.org/licenses/gpl-2.0.html
+ * or from the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
  *
  *
  * Copyright 2008 - 2024 Hitachi Vantara.  All rights reserved.
-*/
+ */
 public abstract class AbstractMondrianSchemaValidatorTestBase {
 
-  protected Schema schema;
-
-  protected Connection conn;
-
-  protected Mockery context;
-
-  protected DatabaseMetaData meta;
-
-  protected ResultSet rsSalesFact1997PrimaryKeys;
-
-  protected ResultSet rsSalesFact1997ForeignKey;
-
-  protected ResultSet rsStorePrimaryKeys;
-
-  protected ResultSet rsCount;
-
-  protected Statement stmt;
-
-  protected MondrianSchemaValidator v1;
-
-  protected MondrianSchemaValidator v2;
-
-  protected MondrianSchemaValidator v3;
-
-  protected MondrianSchemaValidator v4;
-
-  protected MondrianSchemaValidator v5;
-
   protected static final Log logger = LogFactory.getLog( AbstractMondrianSchemaValidatorTestBase.class );
-
+  protected Schema schema;
+  protected Connection conn;
+  protected Mockery context;
+  protected DatabaseMetaData meta;
+  protected ResultSet rsSalesFact1997PrimaryKeys;
+  protected ResultSet rsSalesFact1997ForeignKey;
+  protected ResultSet rsStorePrimaryKeys;
+  protected ResultSet rsCount;
+  protected Statement stmt;
+  protected MondrianSchemaValidator v1;
+  protected MondrianSchemaValidator v2;
+  protected MondrianSchemaValidator v3;
+  protected MondrianSchemaValidator v4;
+  protected MondrianSchemaValidator v5;
 
   @Before
   public void setUp() throws Exception {

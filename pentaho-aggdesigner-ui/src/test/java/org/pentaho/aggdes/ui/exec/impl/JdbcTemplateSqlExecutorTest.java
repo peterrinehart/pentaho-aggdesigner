@@ -1,26 +1,23 @@
 /*
-* This program is free software; you can redistribute it and/or modify it under the
-* terms of the GNU General Public License, version 2 as published by the Free Software
-* Foundation.
-*
-* You should have received a copy of the GNU General Public License along with this
-* program; if not, you can obtain a copy at http://www.gnu.org/licenses/gpl-2.0.html
-* or from the Free Software Foundation, Inc.,
-* 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*
-* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-* See the GNU General Public License for more details.
-*
-*
-* Copyright 2006 - 2017 Hitachi Vantara.  All rights reserved.
-*/
+ * This program is free software; you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License, version 2 as published by the Free Software
+ * Foundation.
+ *
+ * You should have received a copy of the GNU General Public License along with this
+ * program; if not, you can obtain a copy at http://www.gnu.org/licenses/gpl-2.0.html
+ * or from the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ *
+ * Copyright 2006 - 2024 Hitachi Vantara.  All rights reserved.
+ */
 
 package org.pentaho.aggdes.ui.exec.impl;
 
-
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
 
 import junit.framework.TestCase;
 import org.apache.commons.logging.Log;
@@ -42,19 +39,19 @@ import org.pentaho.aggdes.ui.form.model.ConnectionModel;
 import org.pentaho.aggdes.ui.form.model.ConnectionModelImpl;
 import org.pentaho.di.core.database.DatabaseMeta;
 
-@RunWith(MockitoJUnitRunner.class)
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
+
+@RunWith( MockitoJUnitRunner.class )
 public class JdbcTemplateSqlExecutorTest extends TestCase {
 
+  private static final Log logger = LogFactory.getLog( JdbcTemplateSqlExecutorTest.class );
   private boolean executionCompleteCalled;
-
   private ConnectionModel connectionModel = new ConnectionModelImpl();
-
-  private static final Log logger = LogFactory.getLog(JdbcTemplateSqlExecutorTest.class);
-
   @Mock
   private DatabaseMeta dbMeta;
 
-  private JdbcTemplateSqlExecutor exec = new JdbcTemplateSqlExecutor();
+  private final JdbcTemplateSqlExecutor exec = new JdbcTemplateSqlExecutor();
 
   @BeforeClass
   public static void setUpBeforeClass() throws Exception {
@@ -66,7 +63,7 @@ public class JdbcTemplateSqlExecutorTest extends TestCase {
 
   @Before
   public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
+    MockitoAnnotations.initMocks( this );
   }
 
   @After
@@ -76,29 +73,59 @@ public class JdbcTemplateSqlExecutorTest extends TestCase {
   @Test
   public void testExecute() throws Exception {
     // set up
-    Mockito.when(dbMeta.getName()).thenReturn("");
-    Mockito.when(dbMeta.getXML()).thenReturn(null);
-    Mockito.when(dbMeta.getURL()).thenReturn("jdbc:hsqldb:mem:test");
-    Mockito.when(dbMeta.getUsername()).thenReturn("sa");
-    Mockito.when(dbMeta.getPassword()).thenReturn("");
-    Mockito.when(dbMeta.getDriverClass()).thenReturn("org.hsqldb.jdbcDriver");
+    Mockito.when( dbMeta.getName() ).thenReturn( "" );
+    Mockito.when( dbMeta.getXML() ).thenReturn( null );
+    Mockito.when( dbMeta.getURL() ).thenReturn( "jdbc:hsqldb:mem:test" );
+    Mockito.when( dbMeta.getUsername() ).thenReturn( "sa" );
+    Mockito.when( dbMeta.getPassword() ).thenReturn( "" );
+    Mockito.when( dbMeta.getDriverClass() ).thenReturn( "org.hsqldb.jdbcDriver" );
 
     SchemaStub schemaStub = new SchemaStub();
-    schemaStub.setDialect(new DialectStub());
-    connectionModel.setSchema(schemaStub);
+    schemaStub.setDialect( new DialectStub() );
+    connectionModel.setSchema( schemaStub );
 
-    exec.setConnectionModel(connectionModel);
-    connectionModel.setDatabaseMeta(dbMeta);
+    exec.setConnectionModel( connectionModel );
+    connectionModel.setDatabaseMeta( dbMeta );
     executionCompleteCalled = false;
-    exec.execute(new String[] { "", "" }, new ExecutorCallback() {
-      public void executionComplete(Exception e) {
-        if (logger.isDebugEnabled()) {
-          logger.debug("execution complete");
+    exec.execute( new String[] { "", "" }, new ExecutorCallback() {
+      public void executionComplete( Exception e ) {
+        if ( logger.isDebugEnabled() ) {
+          logger.debug( "execution complete" );
         }
         executionCompleteCalled = true;
       }
-    });
-    assertTrue("Execution complete not called.", executionCompleteCalled);
+    } );
+    assertTrue( "Execution complete not called.", executionCompleteCalled );
+  }
+
+  @Test
+  public void testSqlCommentRemoval() {
+    SchemaStub schemaStub = new SchemaStub();
+    schemaStub.setDialect( new DialectStub() );
+    StringBuilder sb = new StringBuilder();
+    schemaStub.getDialect().comment( sb, " my comment" );
+    // sb.append();
+    sb.append( "SELECT * FROM TBL;" );
+
+    String sqlresults = exec.removeCommentsAndSemicolons( schemaStub, sb.toString() );
+
+    assertEquals( sqlresults, "SELECT * FROM TBL" );
+
+    String[] str = new String[] { sb.toString() };
+
+    String[] results = exec.removeCommentsAndSemicolons( schemaStub, str );
+    assertEquals( results.length, 1 );
+    assertEquals( results[ 0 ], "SELECT * FROM TBL" );
+  }
+
+  public ConnectionModel getConnectionModel() {
+
+    return connectionModel;
+  }
+
+  public void setConnectionModel( ConnectionModel connectionModel ) {
+
+    this.connectionModel = connectionModel;
   }
 
   static class DialectStub implements Dialect {
@@ -126,8 +153,8 @@ public class JdbcTemplateSqlExecutorTest extends TestCase {
       return 0;
     }
 
-    public void comment( StringBuilder buf, String s) {
-      buf.append("-- " + s + System.getProperty("line.separator"));
+    public void comment( StringBuilder buf, String s ) {
+      buf.append( "-- " + s + System.getProperty( "line.separator" ) );
     }
 
     @Override public void terminateCommand( StringBuilder buf ) {
@@ -139,36 +166,6 @@ public class JdbcTemplateSqlExecutorTest extends TestCase {
     }
 
 
-  }
-
-  @Test
-  public void testSqlCommentRemoval() {
-    SchemaStub schemaStub = new SchemaStub();
-    schemaStub.setDialect(new DialectStub());
-    StringBuilder sb = new StringBuilder();
-    schemaStub.getDialect().comment(sb, " my comment");
-    // sb.append();
-    sb.append("SELECT * FROM TBL;");
-
-    String sqlresults = exec.removeCommentsAndSemicolons(schemaStub, sb.toString());
-
-    assertEquals(sqlresults, "SELECT * FROM TBL");
-
-    String str[] = new String[] { sb.toString() };
-
-    String results[] = exec.removeCommentsAndSemicolons(schemaStub, str);
-    assertEquals(results.length, 1);
-    assertEquals(results[0], "SELECT * FROM TBL");
-  }
-
-  public ConnectionModel getConnectionModel() {
-
-    return connectionModel;
-  }
-
-  public void setConnectionModel(ConnectionModel connectionModel) {
-
-    this.connectionModel = connectionModel;
   }
 
 }

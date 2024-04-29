@@ -1,28 +1,22 @@
 /*
-* This program is free software; you can redistribute it and/or modify it under the
-* terms of the GNU General Public License, version 2 as published by the Free Software
-* Foundation.
-*
-* You should have received a copy of the GNU General Public License along with this
-* program; if not, you can obtain a copy at http://www.gnu.org/licenses/gpl-2.0.html
-* or from the Free Software Foundation, Inc.,
-* 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*
-* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-* See the GNU General Public License for more details.
-*
-*
-* Copyright 2006 - 2014 Hitachi Vantara.  All rights reserved.
-*/
+ * This program is free software; you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License, version 2 as published by the Free Software
+ * Foundation.
+ *
+ * You should have received a copy of the GNU General Public License along with this
+ * program; if not, you can obtain a copy at http://www.gnu.org/licenses/gpl-2.0.html
+ * or from the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ *
+ * Copyright 2006 - 2024 Hitachi Vantara.  All rights reserved.
+ */
 
 package org.pentaho.aggdes.ui;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -38,9 +32,15 @@ import org.pentaho.ui.xul.binding.BindingFactory;
 import org.pentaho.ui.xul.dom.Document;
 import org.springframework.test.context.ContextConfiguration;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
-@ContextConfiguration(locations={"/applicationContext.xml", "/plugins.xml"})
+
+@RunWith( MockitoJUnitRunner.class )
+@ContextConfiguration( locations = { "/applicationContext.xml", "/plugins.xml" } )
 public class MondrianFileSchemaProviderTest {
 
   private MondrianFileSchemaProvider schemaProvider;
@@ -61,27 +61,27 @@ public class MondrianFileSchemaProviderTest {
     KettleClientEnvironment.init();
     schemaProvider = new MondrianFileSchemaProvider();
 
-    when(container.getDocumentRoot()).thenReturn(doc);
-    lenient().when(doc.getElementById(any(String.class))).thenReturn(mock(XulComponent.class));
+    when( container.getDocumentRoot() ).thenReturn( doc );
+    lenient().when( doc.getElementById( any( String.class ) ) ).thenReturn( mock( XulComponent.class ) );
 
-    schemaProvider.setXulDomContainer(container);
+    schemaProvider.setXulDomContainer( container );
 
     XulSupressingBindingFactoryProxy proxy = new XulSupressingBindingFactoryProxy();
-    proxy.setProxiedBindingFactory(bindingFactory);
-    schemaProvider.setBindingFactory(proxy);
+    proxy.setProxiedBindingFactory( bindingFactory );
+    schemaProvider.setBindingFactory( proxy );
 
     schemaProvider.onLoad();
 
     eventRecorder = new EventRecorder();
-    eventRecorder.setLogging(true);
-    eventRecorder.record(schemaProvider);
+    eventRecorder.setLogging( true );
+    eventRecorder.record( schemaProvider );
   }
 
   @Test
   public void testSchemaDefined_DefaultState() {
-    schemaProvider.setSelected(true);
+    schemaProvider.setSelected( true );
 
-    assertEquals(getDefaultDefinedState(), schemaProvider.isSchemaDefined());
+    assertEquals( getDefaultDefinedState(), schemaProvider.isSchemaDefined() );
   }
 
   @Test
@@ -90,7 +90,7 @@ public class MondrianFileSchemaProviderTest {
 
     defineSchema();
 
-    assertEquals(Boolean.TRUE, eventRecorder.getLastValue("schemaDefined"));
+    assertEquals( Boolean.TRUE, eventRecorder.getLastValue( "schemaDefined" ) );
   }
 
   @Test
@@ -99,18 +99,19 @@ public class MondrianFileSchemaProviderTest {
 
     undefineSchema();
 
-    assertEquals(Boolean.FALSE, eventRecorder.getLastValue("schemaDefined"));
+    assertEquals( Boolean.FALSE, eventRecorder.getLastValue( "schemaDefined" ) );
   }
 
   private void defineSchema() {
-    schemaProvider.setMondrianSchemaFilename("abc");
+    schemaProvider.setMondrianSchemaFilename( "abc" );
   }
 
   private void undefineSchema() {
-    schemaProvider.setMondrianSchemaFilename("");
+    schemaProvider.setMondrianSchemaFilename( "" );
   }
 
   private boolean getDefaultDefinedState() {
-    return (schemaProvider.getMondrianSchemaFilename() == null) ? false : schemaProvider.getMondrianSchemaFilename().length() > 0;
+    return schemaProvider.getMondrianSchemaFilename() != null
+      && schemaProvider.getMondrianSchemaFilename().length() > 0;
   }
 }
