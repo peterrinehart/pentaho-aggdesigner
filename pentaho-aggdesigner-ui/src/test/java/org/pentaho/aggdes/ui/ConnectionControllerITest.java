@@ -24,7 +24,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.pentaho.aggdes.ui.ext.impl.MondrianFileSchemaProvider;
 import org.pentaho.aggdes.ui.form.controller.ConnectionController;
 import org.pentaho.aggdes.ui.form.model.ConnectionModel;
@@ -34,43 +35,84 @@ import org.pentaho.ui.xul.XulComponent;
 import org.pentaho.ui.xul.XulDomContainer;
 import org.pentaho.ui.xul.binding.BindingFactory;
 import org.pentaho.ui.xul.dom.Document;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith( MockitoJUnitRunner.class )
+@RunWith( SpringJUnit4ClassRunner.class )
 @ContextConfiguration( locations = { "/applicationContext.xml", "/plugins.xml", "/ConnectionControllerITest.xml" } )
 public class ConnectionControllerITest {
+/*
+
+  public ConnectionControllerITest( Document doc ) {
+    this.doc = doc;
+  }
+*/
+
+  public ConnectionControllerITest() {
+  }
 
   @Mock
   private Document doc;
 
-  @Mock
+  @Spy
   private XulDomContainer container;
 
   @Mock
   private ConnectionModel model;
 
-  @Mock
   private List<MondrianFileSchemaProvider> mondrianFileSchemaProviders;
 
-  @Mock
-  private BindingFactory bindingFactory;
 
   @InjectMocks
   private ConnectionController controller;
 
+
+/*
+  public ConnectionControllerITest( List<MondrianFileSchemaProvider> mondrianFileSchemaProviders ) {
+    this.mondrianFileSchemaProviders = mondrianFileSchemaProviders;
+  }
+*/
+
+  @Autowired
+  public void setController(ConnectionController controller) {
+    this.controller = controller;
+  }
+  @Autowired
+  public void setModel(ConnectionModel model) {
+    this.model = model;
+  }
+  @Autowired
+  public void setSchemaProviderExtensions(List<MondrianFileSchemaProvider> mondrianFileSchemaProviders) {
+    this.mondrianFileSchemaProviders = mondrianFileSchemaProviders;
+  }
+  /*@Autowired
+  public void setBindingFactory(BindingFactory bindingFactory) {
+    this.bindingFactory = bindingFactory;
+  }*/
+
+  @Mock
+  BindingFactory bindingFactory;
+
+@InjectMocks
+ConnectionControllerITest connectionControllerITest;
+
   @Before
   public void setUp() throws Exception {
+    MockitoAnnotations.initMocks( this ); // Initialize mocks
+
+
     try {
       KettleClientEnvironment.init();
     } catch ( Exception e ) {
@@ -78,18 +120,22 @@ public class ConnectionControllerITest {
     }
 
     XulSupressingBindingFactoryProxy proxy = new XulSupressingBindingFactoryProxy();
-    proxy.setProxiedBindingFactory( bindingFactory );
+    proxy.setProxiedBindingFactory( controller.bindingFactory );
 
+    // Mock behavior for doc and bindingFactory
     when( container.getDocumentRoot() ).thenReturn( doc );
     when( doc.getElementById( any() ) ).thenReturn( mock( XulComponent.class ) );
-    //when(bindingFactory.setDocument(doc)).thenReturn(proxy);
-    doNothing().when( bindingFactory ).setDocument( doc );
+    doNothing().when( controller.bindingFactory ).setDocument( doc );
 
-    for ( MondrianFileSchemaProvider provider : mondrianFileSchemaProviders ) {
-      provider.setXulDomContainer( container );
-      provider.setBindingFactory( proxy );
+    // Set up behavior for mondrianFileSchemaProviders
+    if ( connectionControllerITest.mondrianFileSchemaProviders != null ) {
+      for ( MondrianFileSchemaProvider provider : mondrianFileSchemaProviders ) {
+        provider.setXulDomContainer( container );
+        provider.setBindingFactory( proxy );
+      }
     }
 
+    // Mock behavior for model
     when( model.isApplySchemaSourceEnabled() ).thenReturn( false );
   }
 
@@ -122,19 +168,13 @@ public class ConnectionControllerITest {
     when( prvdr1.isSchemaDefined() ).thenReturn( true );
     when( prvdr2.isSchemaDefined() ).thenReturn( true );
 
-    //    controller.onProviderSelection(prvdr1);
-
     assertTrue( model.isApplySchemaSourceEnabled() );
     verify( model ).setApplySchemaSourceEnabled( true );
-
-    //   controller.onProviderSelection(prvdr2);
 
     assertTrue( model.isApplySchemaSourceEnabled() );
     verify( model, times( 2 ) ).setApplySchemaSourceEnabled( true );
 
     when( prvdr1.isSchemaDefined() ).thenReturn( false );
-
-    //  controller.onProviderSelection(prvdr1);
 
     assertFalse( model.isApplySchemaSourceEnabled() );
     verify( model ).setApplySchemaSourceEnabled( false );

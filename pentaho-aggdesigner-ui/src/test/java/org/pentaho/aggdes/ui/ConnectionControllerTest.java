@@ -80,7 +80,7 @@ public class ConnectionControllerTest {
   private List<String> cubeNames;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     controller = new ConnectionController();
     controller.setConnectionModel( model );
     controller.setOutputService( outputService );
