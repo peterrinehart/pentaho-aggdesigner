@@ -32,7 +32,7 @@
     <pentaho-launcher.version>10.2.0.0-SNAPSHOT</pentaho-launcher.version>
     <dependency.javassist.revision>3.20.0-GA</dependency.javassist.revision>
     <pdi.version>10.2.0.0-SNAPSHOT</pdi.version>
-    <mockito-all.version>1.9.5</mockito-all.version>
+    <jmock.version>2.4.0</jmock.version>
   </properties>
 
   <dependencies>
@@ -416,6 +416,24 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jmock</groupId>
+      <artifactId>jmock</artifactId>
+      <version>${jmock.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jmock</groupId>
+      <artifactId>jmock-junit4</artifactId>
+      <version>${jmock.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jmock</groupId>
+      <artifactId>jmock-legacy</artifactId>
+      <version>${jmock.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
